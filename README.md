@@ -1,319 +1,149 @@
-# kernel-driver-experiment
+# embedded-linux-porting
+# Commands to Create and Save README File
 
-# Kernel-Space Device Driver Experiment — All Commands with Simple Explanation
+Inside your repository terminal.
 
 ---
 
-# 1. Update Linux Packages
+# Step 1 — Create README File
 
+```bash id="jlwm3k"
+nano README.md
+```
+
+---
+
+# Step 2 — Paste README Content
+
+Paste this:
+
+````md id="jlwm6v"
+# Embedded Linux Porting on ARM
+
+## Aim
+To port and boot an Embedded Linux kernel on ARM architecture using QEMU emulator.
+
+---
+
+## Tools Used
+- GitHub Codespaces
+- ARM Cross Compiler
+- QEMU ARM Emulator
+- Linux Kernel Source
+
+---
+
+## Commands Used
+
+### Update Linux
 ```bash
 sudo apt update
-```
+````
 
-## Why Used?
-
-Updates Linux package information before installing software.
-
----
-
-# 2. Install Required Tools
+### Install Required Tools
 
 ```bash
-sudo apt install build-essential linux-headers-$(uname -r) kmod -y
+sudo apt install gcc-arm-linux-gnueabi qemu-system-arm u-boot-tools build-essential git busybox cpio flex bison bc libssl-dev -y
 ```
 
-## Why Used?
-
-Installs required tools for kernel driver development.
-
-| Package         | Purpose                            |
-| --------------- | ---------------------------------- |
-| build-essential | GCC compiler and build tools       |
-| linux-headers   | Kernel header files                |
-| kmod            | Provides insmod and rmmod commands |
-
----
-
-# 3. Create Driver Source File
+### Clone Linux Kernel
 
 ```bash
-nano mydriver.c
+git clone https://github.com/torvalds/linux.git
 ```
 
-## Why Used?
+### Enter Linux Directory
 
-Creates C file for Linux kernel driver code.
+```bash
+cd linux
+```
+
+### Configure ARM Kernel
+
+```bash
+make ARCH=arm versatile_defconfig
+```
+
+### Build ARM Kernel
+
+```bash
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j4
+```
+
+### Build Device Tree Files
+
+```bash
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- dtbs
+```
+
+### Run ARM Linux Kernel
+
+```bash
+qemu-system-arm \
+-M versatilepb \
+-kernel arch/arm/boot/zImage \
+-dtb arch/arm/boot/dts/arm/versatile-pb.dtb \
+-append "console=ttyAMA0" \
+-nographic \
+-audio none
+```
 
 ---
 
-# 4. Driver Code
+## Output
 
-```c
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/init.h>
-
-static int __init mydriver_init(void)
-{
-    printk(KERN_ALERT "Driver Loaded Successfully\n");
-    return 0;
-}
-
-static void __exit mydriver_exit(void)
-{
-    printk(KERN_ALERT "Driver Removed Successfully\n");
-}
-
-module_init(mydriver_init);
-module_exit(mydriver_exit);
-
-MODULE_LICENSE("GPL");
-```
-
-## Why Used?
-
-Creates a simple Linux kernel module.
-
-### Important Functions
-
-| Function        | Purpose                   |
-| --------------- | ------------------------- |
-| mydriver_init() | Runs when driver loads    |
-| mydriver_exit() | Runs when driver removes  |
-| printk()        | Prints kernel message     |
-| module_init()   | Registers load function   |
-| module_exit()   | Registers remove function |
+* ARM Linux kernel booted successfully.
+* Linux initialized ARM hardware devices.
+* Kernel panic occurred because root filesystem was not attached.
 
 ---
 
-# 5. Save File in Nano
+## Result
 
-```text
+The Embedded Linux kernel was successfully cross-compiled and booted on ARM architecture using QEMU emulator.
+
+````
+
+---
+
+# Step 3 — Save File
+
+Press:
+
+```text id="jlwm5q"
 CTRL + O
 ENTER
 CTRL + X
-```
-
-## Why Used?
-
-| Key      | Purpose          |
-| -------- | ---------------- |
-| CTRL + O | Save file        |
-| ENTER    | Confirm filename |
-| CTRL + X | Exit editor      |
+````
 
 ---
 
-# 6. Create Makefile
+# Step 4 — Add README to Git
 
-```bash
-nano Makefile
-```
-
-## Why Used?
-
-Creates build instructions for kernel module compilation.
-
----
-
-# 7. Makefile Code
-
-```makefile
-obj-m += mydriver.o
-
-all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
-
-clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
-```
-
-## Why Used?
-
-| Part         | Purpose                 |
-| ------------ | ----------------------- |
-| obj-m        | Defines kernel module   |
-| make modules | Builds driver           |
-| make clean   | Removes generated files |
-
----
-
-# 8. Build Driver
-
-```bash
-make
-```
-
-## Why Used?
-
-Compiles driver source code into kernel module.
-
-### Output Generated
-
-```text
-mydriver.ko
-```
-
-`.ko` means Linux kernel object/module.
-
----
-
-# 9. Check Generated Files
-
-```bash
-ls
-```
-
-## Why Used?
-
-Displays all files in current folder.
-
-Expected important file:
-
-```text
-mydriver.ko
+```bash id="jlwm1y"
+git add README.md
 ```
 
 ---
 
-# 10. Load Driver into Kernel
+# Step 5 — Commit README
 
-```bash
-sudo insmod mydriver.ko
-```
-
-## Why Used?
-
-Inserts driver into Linux kernel memory.
-
-### Meaning
-
-* Driver becomes active
-* Kernel starts using module
-
----
-
-# 11. Show Success Message
-
-```bash
-echo "Driver Loaded Successfully"
-```
-
-## Why Used?
-
-Displays visible message on terminal.
-
----
-
-# 12. Verify Driver Loaded
-
-```bash
-lsmod | grep mydriver
-```
-
-## Why Used?
-
-Checks whether driver is currently loaded.
-
-Expected output:
-
-```text
-mydriver
+```bash id="jlwm4b"
+git commit -m "Added README file"
 ```
 
 ---
 
-# 13. Remove Driver
+# Step 6 — Push to GitHub
 
-```bash
-sudo rmmod mydriver
-```
-
-## Why Used?
-
-Removes driver from Linux kernel.
-
----
-
-# 14. Show Remove Message
-
-```bash
-echo "Driver Removed Successfully"
-```
-
-## Why Used?
-
-Displays remove confirmation on terminal.
-
----
-
-# 15. Verify Driver Removed
-
-```bash
-lsmod | grep mydriver
-```
-
-## Why Used?
-
-Checks whether driver is removed.
-
-No output means:
-
-* driver removed successfully
-
----
-
-# 16. Save Files to GitHub
-
-```bash
-git add .
-```
-
-## Why Used?
-
-Adds all files for saving.
-
----
-
-# 17. Create Commit
-
-```bash
-git commit -m "Kernel driver experiment completed"
-```
-
-## Why Used?
-
-Creates permanent save point.
-
----
-
-# 18. Upload to GitHub
-
-```bash
+```bash id="jlwm9d"
 git push
 ```
 
-## Why Used?
-
-Uploads experiment files to GitHub repository.
-
 ---
 
-# Complete Experiment Flow
+# Verify
 
-| Step               | Command                   | Purpose              |
-| ------------------ | ------------------------- | -------------------- |
-| Install tools      | `sudo apt install ...`    | Install driver tools |
-| Create source file | `nano mydriver.c`         | Write driver code    |
-| Create Makefile    | `nano Makefile`           | Build instructions   |
-| Compile driver     | `make`                    | Generate `.ko` file  |
-| Load driver        | `sudo insmod mydriver.ko` | Insert into kernel   |
-| Check driver       | `lsmod`                   | Verify loaded        |
-| Remove driver      | `sudo rmmod mydriver`     | Remove from kernel   |
-| Save to GitHub     | `git push`                | Store experiment     |
+Open your repository on [GitHub](https://github.com?utm_source=chatgpt.com)
 
----
-
-# Very Simple Meaning of Experiment
-
-You created a Linux kernel driver, compiled it into a kernel module, loaded it into the Linux kernel, verified it worked, and removed it safely. This demonstrates how Linux communicates with hardware using device drivers.
+You will see formatted `README.md` displayed automatically.
