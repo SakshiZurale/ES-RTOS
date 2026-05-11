@@ -1,0 +1,1 @@
+savedcmd_/workspaces/kernel-driver-experiment/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /workspaces/kernel-driver-experiment/Module.symvers -T /workspaces/kernel-driver-experiment/modules.order -i Module.symvers -e 

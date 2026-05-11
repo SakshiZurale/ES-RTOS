@@ -1,0 +1,1 @@
+savedcmd_/workspaces/kernel-driver-experiment/mydriver.mod := printf '%s\n'   mydriver.o | awk '!x[$$0]++ { print("/workspaces/kernel-driver-experiment/"$$0) }' > /workspaces/kernel-driver-experiment/mydriver.mod
